@@ -43,3 +43,16 @@ def emitir_tokens(usuario):
         'refresh': jwt.encode(refresh, settings.JWT_SECRET_KEY,
                               algorithm='HS256'),
     }
+
+
+def decodificar(token, tipo_esperado):
+    try:
+        payload = jwt.decode(token, settings.JWT_SECRET_KEY,
+                             algorithms=['HS256'])
+    except jwt.ExpiredSignatureError:
+        raise TokenError('Token expirado')
+    except jwt.InvalidTokenError:
+        raise TokenError('Token invalido')
+    if payload.get('tipo') != tipo_esperado:
+        raise TokenError('Tipo de token invalido')
+    return payload
