@@ -96,3 +96,16 @@ class RolPermiso(models.Model):
                 name='rolpermiso_tipo_valido',
             ),
         ]
+
+
+class SesionJWT(models.Model):
+    usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, related_name='sesiones')
+    jti = models.CharField(max_length=64, unique=True)
+    tipo = models.CharField(max_length=10)
+    expira = models.DateTimeField()
+    revocada = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        db_table = 'session_jwt'
