@@ -42,3 +42,14 @@ class Usuario(models.Model):
 
     class Meta:
         db_table = 'usuarios'
+
+
+class Rol(models.Model):
+    nombre = models.CharField(max_length=100, unique=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.nombre
+
+    class Meta:
+        db_table = 'usuarios_rol'
