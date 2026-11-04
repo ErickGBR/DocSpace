@@ -53,3 +53,46 @@ class Rol(models.Model):
 
     class Meta:
         db_table = 'usuarios_rol'
+
+
+class RolPermiso(models.Model):
+    tipo = models.CharField(max_length=20)
+    rol = models.ForeignKey(Rol, on_delete=models.CASCADE, related_name='permisos')
+    editar = models.BooleanField(default=False)
+    leer = models.BooleanField(default=True)
+    administracion = models.BooleanField(default=False)
+    documento = models.ForeignKey(
+        'documentos.Documento',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='permisos_rol',
+    )
+    espacio_trabajo = models.ForeignKey(
+        'espacios_trabajo.EspacioTrabajo',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='permisos_rol',
+    )
+    usuario = models.ForeignKey(
+        'cuentas_usuario.Usuario',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='permisos_rol',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'usuarios_rol_permisos'
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(tipo='admin') |
+                    models.Q(tipo='documento') |
+                    models.Q(tipo='espacio')
+                ),
+                name='rolpermiso_tipo_valido',
+            ),
+        ]
