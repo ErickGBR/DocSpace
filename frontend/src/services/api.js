@@ -124,6 +124,11 @@ class ApiService {
   getDocumentoVersions(id) {
     return this.request(`/documentos/${id}/versions/`);
   }
+
+  getDocumentoContent(id, version) {
+    const query = version ? `?version=${version}` : '';
+    return this.request(`/documentos/${id}/content/${query}`);
+  }
 }
 
 export const api = new ApiService();
