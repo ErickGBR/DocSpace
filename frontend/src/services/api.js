@@ -78,6 +78,14 @@ class ApiService {
     }
     return false;
   }
+
+  // Auth
+  login(email, password) {
+    return this.request('/auth/login/', {
+      method: 'POST',
+      body: { email, password },
+    });
+  }
 }
 
 export const api = new ApiService();
