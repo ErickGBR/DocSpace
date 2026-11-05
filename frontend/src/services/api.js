@@ -129,6 +129,10 @@ class ApiService {
     const query = version ? `?version=${version}` : '';
     return this.request(`/documentos/${id}/content/${query}`);
   }
+
+  deleteDocumento(id) {
+    return this.request(`/documentos/${id}/`, { method: 'DELETE' });
+  }
 }
 
 export const api = new ApiService();
