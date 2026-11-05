@@ -42,3 +42,27 @@ def get_version_file(document_folder: Path, filename: str, version_epoch: int = 
 
 def get_next_version_epoch(document_folder: Path, filename: str) -> int:
     return int(datetime.now().timestamp())
+
+
+def save_initial_file(gestor_id: int, filename: str, content: bytes, mime_type: str = None) -> dict:
+    document_folder = get_document_folder(gestor_id, filename)
+    root_file = get_document_root_file(document_folder, filename)
+
+    root_file.write_bytes(content)
+
+    version_epoch = int(datetime.now().timestamp())
+    version_file = get_version_file(document_folder, filename, version_epoch)
+    version_file.write_bytes(content)
+
+    relative_root = root_file.relative_to(BASE_STORAGE_PATH)
+    relative_version = version_file.relative_to(BASE_STORAGE_PATH)
+    relative_folder = document_folder.relative_to(BASE_STORAGE_PATH)
+
+    return {
+        'storage_path': str(relative_folder),
+        'documento_path': str(relative_root),
+        'documento_path_version': str(relative_version),
+        'version_epoch': version_epoch,
+        'size': len(content),
+        'mime_type': mime_type or 'application/octet-stream',
+    }
