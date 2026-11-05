@@ -66,3 +66,30 @@ def save_initial_file(gestor_id: int, filename: str, content: bytes, mime_type: 
         'size': len(content),
         'mime_type': mime_type or 'application/octet-stream',
     }
+
+
+def save_new_version(document_folder_rel: str, filename: str, content: bytes, version_epoch: int = None) -> dict:
+    document_folder = BASE_STORAGE_PATH / document_folder_rel
+    if not document_folder.exists():
+        raise FileNotFoundError(f"Carpeta de documento no encontrada: {document_folder}")
+
+    root_file = get_document_root_file(document_folder, filename)
+
+    if version_epoch is None:
+        version_epoch = get_next_version_epoch(document_folder, filename)
+
+    version_file = get_version_file(document_folder, filename, version_epoch)
+    if root_file.exists():
+        shutil.copy2(root_file, version_file)
+
+    root_file.write_bytes(content)
+
+    relative_root = root_file.relative_to(BASE_STORAGE_PATH)
+    relative_version = version_file.relative_to(BASE_STORAGE_PATH)
+
+    return {
+        'documento_path': str(relative_root),
+        'documento_path_version': str(relative_version),
+        'version_epoch': version_epoch,
+        'size': len(content),
+    }
