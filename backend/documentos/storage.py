@@ -31,3 +31,10 @@ def get_document_folder(gestor_id: int, filename: str) -> Path:
 
 def get_document_root_file(document_folder: Path, filename: str) -> Path:
     return document_folder / filename
+
+
+def get_version_file(document_folder: Path, filename: str, version_epoch: int = None) -> Path:
+    versions_folder = document_folder / 'versions'
+    name, ext = os.path.splitext(filename)
+    epoch = version_epoch or int(datetime.now().timestamp())
+    return versions_folder / f"{name}_{epoch}{ext}"
