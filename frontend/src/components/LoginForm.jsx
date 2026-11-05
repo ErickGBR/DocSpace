@@ -37,6 +37,11 @@ export default function LoginForm() {
             <p className="text-gray-500 mt-1">Inicia sesión para continuar</p>
           </div>
 
+          {error && (
+            <div className="mb-4 p-3 bg-red-50 border border-red-200 text-red-700 rounded text-sm" role="alert" aria-live="polite">
+              {error}
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
