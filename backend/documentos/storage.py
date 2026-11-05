@@ -38,3 +38,7 @@ def get_version_file(document_folder: Path, filename: str, version_epoch: int = 
     name, ext = os.path.splitext(filename)
     epoch = version_epoch or int(datetime.now().timestamp())
     return versions_folder / f"{name}_{epoch}{ext}"
+
+
+def get_next_version_epoch(document_folder: Path, filename: str) -> int:
+    return int(datetime.now().timestamp())
