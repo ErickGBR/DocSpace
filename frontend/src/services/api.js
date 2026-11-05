@@ -86,6 +86,13 @@ class ApiService {
       body: { email, password },
     });
   }
+
+  register(userData) {
+    return this.request('/auth/register/', {
+      method: 'POST',
+      body: userData,
+    });
+  }
 }
 
 export const api = new ApiService();
