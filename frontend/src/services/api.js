@@ -93,6 +93,10 @@ class ApiService {
       body: userData,
     });
   }
+
+  logout() {
+    return this.request('/auth/logout/', { method: 'POST' }).finally(() => this.clearTokens());
+  }
 }
 
 export const api = new ApiService();
