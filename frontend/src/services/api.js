@@ -120,6 +120,10 @@ class ApiService {
     const query = new URLSearchParams(params).toString();
     return this.request(`/documentos/?${query}`);
   }
+
+  getDocumentoVersions(id) {
+    return this.request(`/documentos/${id}/versions/`);
+  }
 }
 
 export const api = new ApiService();
