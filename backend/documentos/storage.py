@@ -27,3 +27,7 @@ def get_document_folder(gestor_id: int, filename: str) -> Path:
     versions_folder.mkdir(exist_ok=True)
 
     return folder
+
+
+def get_document_root_file(document_folder: Path, filename: str) -> Path:
+    return document_folder / filename
