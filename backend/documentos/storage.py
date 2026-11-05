@@ -137,3 +137,11 @@ def get_file_content(document_folder_rel: str, filename: str, version_epoch: int
         raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
 
     return file_path.read_bytes()
+
+
+def delete_document(document_folder_rel: str) -> bool:
+    document_folder = BASE_STORAGE_PATH / document_folder_rel
+    if document_folder.exists():
+        shutil.rmtree(document_folder)
+        return True
+    return False
