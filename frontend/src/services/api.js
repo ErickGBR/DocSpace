@@ -108,6 +108,13 @@ class ApiService {
       body: formData,
     });
   }
+
+  saveDocumento(id, content) {
+    return this.request(`/documentos/${id}/save/`, {
+      method: 'POST',
+      body: { content },
+    });
+  }
 }
 
 export const api = new ApiService();
