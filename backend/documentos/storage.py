@@ -123,3 +123,17 @@ def get_document_versions(document_folder_rel: str, filename: str) -> list:
             continue
 
     return sorted(versions, key=lambda x: x['version_epoch'])
+
+
+def get_file_content(document_folder_rel: str, filename: str, version_epoch: int = None) -> bytes:
+    document_folder = BASE_STORAGE_PATH / document_folder_rel
+
+    if version_epoch is None:
+        file_path = get_document_root_file(document_folder, filename)
+    else:
+        file_path = get_version_file(document_folder, filename, version_epoch)
+
+    if not file_path.exists():
+        raise FileNotFoundError(f"Archivo no encontrado: {file_path}")
+
+    return file_path.read_bytes()
