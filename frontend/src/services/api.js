@@ -97,6 +97,17 @@ class ApiService {
   logout() {
     return this.request('/auth/logout/', { method: 'POST' }).finally(() => this.clearTokens());
   }
+
+  // Documentos
+  uploadDocumento(formData) {
+    return this.request('/documentos/upload/', {
+      method: 'POST',
+      headers: {
+        ...this.getAuthHeader(),
+      },
+      body: formData,
+    });
+  }
 }
 
 export const api = new ApiService();
