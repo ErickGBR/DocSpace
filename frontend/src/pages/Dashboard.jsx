@@ -30,6 +30,89 @@ export default function Dashboard() {
     cargarDocumentos();
   }, [cargarDocumentos]);
 
+  const handleUpload = async (e) => {
+    e.preventDefault();
+    if (!uploadFile) return;
+    if (!isGestor) return alert('Solo gestores y admins pueden subir');
+    if (!esArchivoTexto(uploadFile)) return alert('Solo se permiten archivos de texto');
+
+    const formData = new FormData();
+    formData.append('archivo', uploadFile);
+    formData.append('espacio_trabajo_id', '1');
+    formData.append('nombre_documento', uploadFile.name);
+
+    setUploading(true);
+    try {
+      await api.uploadDocumento(formData);
+      setUploadFile(null);
+      cargarDocumentos();
+    } catch (err) {
+      alert(err.data?.detail || 'Error al subir');
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar documento?')) return;
+    try {
+      await api.deleteDocumento(id);
+      cargarDocumentos();
+    } catch (e) {
+      alert('Error al eliminar');
+    }
+  };
+
+  const formatSize = (bytes) => {
+    if (!bytes) return '-';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  };
+
+  const formatDate = (iso) => {
+    if (!iso) return '-';
+    return new Date(iso).toLocaleDateString('es-ES', {
+      day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  };
+
+  const getFileIcon = (mimeType) => {
+    if (!mimeType) return 'fas fa-file text-gray-400';
+    if (mimeType.includes('pdf')) return 'fas fa-file-pdf text-red-500';
+    if (mimeType.includes('word') || mimeType.includes('document')) return 'fas fa-file-word text-blue-500';
+    if (mimeType.includes('excel') || mimeType.includes('spreadsheet')) return 'fas fa-file-excel text-green-500';
+    if (mimeType.includes('image')) return 'fas fa-file-image text-purple-500';
+    if (mimeType.includes('text') || mimeType.includes('sql')) return 'fas fa-file-code text-yellow-500';
+    return 'fas fa-file text-gray-400';
+  };
+
+  const esArchivoTexto = (file) => {
+    const extensionesTexto = [
+      'txt', 'md', 'js', 'ts', 'jsx', 'tsx', 'json', 'xml', 'html', 'css', 'scss',
+      'sql', 'py', 'java', 'cpp', 'c', 'h', 'cs', 'php', 'rb', 'go', 'rs',
+      'sh', 'bat', 'ps1', 'yaml', 'yml', 'toml', 'ini', 'cfg', 'conf',
+      'log', 'csv', 'rtf', 'vue', 'svelte', 'astro', 'prisma', 'graphql'
+    ];
+    const ext = file.name.split('.').pop()?.toLowerCase();
+    const mimeText = file.type.startsWith('text/') ||
+      file.type === 'application/json' ||
+      file.type === 'application/xml' ||
+      file.type === 'application/javascript' ||
+      file.type === 'application/sql';
+    return ext && extensionesTexto.includes(ext) || mimeText;
+  };
+
+  const filteredDocumentos = documentos.filter(doc => {
+    if (!searchQuery) return true;
+    const query = searchQuery.toLowerCase();
+    return (
+      doc.nombre_documento?.toLowerCase().includes(query) ||
+      doc.espacio_trabajo?.toLowerCase().includes(query) ||
+      doc.usuario?.toLowerCase().includes(query)
+    );
+  });
+
   return (
     <div className="min-h-screen bg-gray-100 flex">
       {/* Sidebar */}
@@ -163,12 +246,12 @@ export default function Dashboard() {
             <HistorialView />
           ) : (
             <DocumentosView
-              documentos={documentos}
+              documentos={filteredDocumentos}
               loading={loading}
-              onDelete={() => {}}
-              formatSize={() => ''}
-              formatDate={() => ''}
-              getFileIcon={() => ''}
+              onDelete={handleDelete}
+              formatSize={formatSize}
+              formatDate={formatDate}
+              getFileIcon={getFileIcon}
               isGestor={isGestor}
             />
           )}
