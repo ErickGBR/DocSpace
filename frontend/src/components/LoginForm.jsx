@@ -12,6 +12,20 @@ export default function LoginForm() {
 
   const from = location.state?.from?.pathname || '/dashboard';
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+    try {
+      await login(form.email, form.password);
+      navigate(from, { replace: true });
+    } catch (err) {
+      setError(err.data?.detail || 'Credenciales inválidas');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 px-4">
       <div className="w-full max-w-md">
@@ -23,7 +37,7 @@ export default function LoginForm() {
             <p className="text-gray-500 mt-1">Inicia sesión para continuar</p>
           </div>
 
-          <form onSubmit={() => {}} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
                 Email
