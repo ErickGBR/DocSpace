@@ -94,7 +94,7 @@ export default function LoginForm() {
             <p>¿No tienes cuenta?{' '}
               <button
                 type="button"
-                className="text-blue-600 font-medium hover:text-blue-700 hover:underline"
+                className="text-blue-600 font-medium hover:text-blue-700 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
                 onClick={() => navigate('/register')}
               >
                 Regístrate
