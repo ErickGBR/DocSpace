@@ -133,6 +133,12 @@ class ApiService {
   deleteDocumento(id) {
     return this.request(`/documentos/${id}/`, { method: 'DELETE' });
   }
+
+  // Historial
+  getHistorial(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/auditoria/historial/?${query}`);
+  }
 }
 
 export const api = new ApiService();
