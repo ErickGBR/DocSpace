@@ -93,3 +93,33 @@ def save_new_version(document_folder_rel: str, filename: str, content: bytes, ve
         'version_epoch': version_epoch,
         'size': len(content),
     }
+
+
+def get_document_versions(document_folder_rel: str, filename: str) -> list:
+    document_folder = BASE_STORAGE_PATH / document_folder_rel
+    versions_folder = document_folder / 'versions'
+
+    if not versions_folder.exists():
+        return []
+
+    name, ext = os.path.splitext(filename)
+    versions = []
+
+    for v_file in sorted(versions_folder.glob(f"{name}_*{ext}")):
+        try:
+            stem = v_file.stem
+            epoch_str = stem.split('_')[-1]
+            version_epoch = int(epoch_str)
+            stat = v_file.stat()
+            versions.append({
+                'version_epoch': version_epoch,
+                'version_datetime': datetime.fromtimestamp(version_epoch).isoformat(),
+                'filename': v_file.name,
+                'path': str(v_file.relative_to(BASE_STORAGE_PATH)),
+                'size': stat.st_size,
+                'created_at': datetime.fromtimestamp(stat.st_ctime).isoformat(),
+            })
+        except (ValueError, IndexError):
+            continue
+
+    return sorted(versions, key=lambda x: x['version_epoch'])
