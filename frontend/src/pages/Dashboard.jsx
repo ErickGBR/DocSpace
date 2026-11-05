@@ -257,6 +257,50 @@ export default function Dashboard() {
           )}
         </main>
       </div>
+
+      {/* Upload Modal */}
+      {uploadFile && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50" onClick={() => setUploadFile(null)}>
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4" onClick={(e) => e.stopPropagation()}>
+            <div className="flex items-center justify-between p-4 border-b border-gray-200">
+              <h3 className="font-semibold text-gray-900">Subir documento</h3>
+              <button
+                onClick={() => setUploadFile(null)}
+                className="p-1 rounded-lg hover:bg-gray-100 text-gray-500 transition"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+            <form onSubmit={handleUpload} className="p-4 space-y-4">
+              <div className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
+                <i className={getFileIcon(uploadFile.type) + ' text-3xl'}></i>
+                <div className="flex-1 min-w-0">
+                  <p className="font-medium text-gray-900 truncate">{uploadFile.name}</p>
+                  <p className="text-sm text-gray-500">{formatSize(uploadFile.size)} • {uploadFile.type || 'Tipo desconocido'}</p>
+                </div>
+              </div>
+              <div className="flex justify-end space-x-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setUploadFile(null)}
+                  className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition disabled:opacity-50"
+                  disabled={uploading}
+                >
+                  {uploading ? 'Subiendo...' : 'Subir'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -278,11 +322,178 @@ function NavItem({ icon, label, active, onClick, sidebarOpen }) {
 }
 
 function DocumentosView({ documentos, loading, onDelete, formatSize, formatDate, getFileIcon, isGestor }) {
-  return <div>DocumentosView placeholder</div>;
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <svg className="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (documentos.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <svg className="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+        </svg>
+        <h3 className="mt-4 text-lg font-medium text-gray-900">No hay documentos</h3>
+        <p className="mt-1 text-gray-500">Comienza subiendo tu primer documento</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-12">Archivo</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Espacio</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Usuario</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden sm:table-cell">Tamaño</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden md:table-cell">Versiones</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actualizado</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-24">Acciones</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {documentos.map((d) => (
+              <tr key={d.id} className="hover:bg-gray-50 transition">
+                <td className="px-4 py-3">
+                  <i className={getFileIcon(d.mime_type) + ' text-2xl'}></i>
+                </td>
+                <td className="px-4 py-3">
+                  <p className="font-medium text-gray-900 truncate max-w-xs">{d.nombre_documento}</p>
+                </td>
+                <td className="px-4 py-3 hidden md:table-cell">
+                  <p className="text-sm text-gray-500">{d.espacio_trabajo || '-'}</p>
+                </td>
+                <td className="px-4 py-3 hidden lg:table-cell">
+                  <p className="text-sm text-gray-500">{d.usuario || '-'}</p>
+                </td>
+                <td className="px-4 py-3 hidden sm:table-cell">
+                  <p className="text-sm text-gray-500">{formatSize(d.size)}</p>
+                </td>
+                <td className="px-4 py-3 hidden md:table-cell">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                    {d.version_actual || d.versiones?.length || 1}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <p className="text-sm text-gray-500 whitespace-nowrap">{formatDate(d.updated_at || d.created_at)}</p>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="flex items-center space-x-2">
+                    <button
+                      className="p-2 rounded-lg hover:bg-gray-100 text-gray-500 transition"
+                      title="Ver/Descargar"
+                    >
+                      <EyeIcon className="w-5 h-5" />
+                    </button>
+                    {isGestor && (
+                      <button
+                        onClick={() => onDelete(d.id)}
+                        className="p-2 rounded-lg hover:bg-red-50 text-red-500 transition"
+                        title="Eliminar"
+                      >
+                        <TrashIcon className="w-5 h-5" />
+                      </button>
+                    )}
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
 function HistorialView() {
-  return <div>HistorialView placeholder</div>;
+  const [historial, setHistorial] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    cargarHistorial();
+  }, []);
+
+  const cargarHistorial = async () => {
+    setLoading(true);
+    try {
+      const data = await api.getHistorial({ limit: 100 });
+      setHistorial(data.results || data);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <svg className="animate-spin h-8 w-8 text-blue-600" fill="none" viewBox="0 0 24 24">
+          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+        </svg>
+      </div>
+    );
+  }
+
+  if (historial.length === 0) {
+    return (
+      <div className="text-center py-16">
+        <svg className="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <h3 className="mt-4 text-lg font-medium text-gray-900">Sin historial</h3>
+        <p className="mt-1 text-gray-500">No hay actividad registrada</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+      <div className="overflow-x-auto">
+        <table className="w-full">
+          <thead className="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acción</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Detalle</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Usuario</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-200">
+            {historial.map((h) => (
+              <tr key={h.id} className="hover:bg-gray-50 transition">
+                <td className="px-4 py-3 whitespace-nowrap">
+                  <p className="text-sm text-gray-500">{new Date(h.created_at).toLocaleString('es-ES')}</p>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">
+                    {h.accion}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <p className="text-sm text-gray-900">{h.accion_detalle}</p>
+                </td>
+                <td className="px-4 py-3">
+                  <p className="text-sm text-gray-500">{h.usuario_nombre || h.usuario_email || '-'}</p>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
 }
 
 // SVG Icons
