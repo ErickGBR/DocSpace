@@ -115,6 +115,11 @@ class ApiService {
       body: { content },
     });
   }
+
+  getDocumentos(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/documentos/?${query}`);
+  }
 }
 
 export const api = new ApiService();
