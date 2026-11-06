@@ -40,8 +40,12 @@ export function AuthProvider({ children }) {
   };
 
   const logout = async () => {
-    await api.logout();
-    setUser(null);
+    try {
+      await api.logout();
+    } finally {
+      api.clearTokens();
+      setUser(null);
+    }
   };
 
   const value = {
