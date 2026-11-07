@@ -237,6 +237,18 @@ export default function Dashboard() {
                 />
               </label>
             )}
+
+            {/* Logout Button */}
+            <button
+              onClick={logout}
+              className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition"
+              title="Cerrar sesión"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+              </svg>
+              <span className="hidden sm:inline">Salir</span>
+            </button>
           </div>
         </header>
 
