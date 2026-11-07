@@ -139,6 +139,23 @@ class ApiService {
     const query = new URLSearchParams(params).toString();
     return this.request(`/auditoria/historial/?${query}`);
   }
+
+  // Espacios de trabajo
+  getEspacios(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/espacios/?${query}`);
+  }
+
+  createEspacio(data) {
+    return this.request('/espacios/', {
+      method: 'POST',
+      body: data,
+    });
+  }
+
+  deleteEspacio(id) {
+    return this.request(`/espacios/${id}/`, { method: 'DELETE' });
+  }
 }
 
 

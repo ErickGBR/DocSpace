@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Historial
+from cuentas_usuario.serializers import UsuarioSerializer
 
 
 class HistorialSerializer(serializers.ModelSerializer):
@@ -8,14 +9,5 @@ class HistorialSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Historial
-        fields = [
-            'id',
-            'accion',
-            'accion_detalle',
-            'usuario',
-            'usuario_nombre',
-            'usuario_email',
-            'recurso_tipo',
-            'created_at',
-        ]
+        fields = ['id', 'accion', 'accion_detalle', 'usuario', 'usuario_nombre', 'usuario_email', 'recurso_tipo', 'created_at']
         read_only_fields = fields

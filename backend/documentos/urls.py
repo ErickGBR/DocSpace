@@ -1,12 +1,10 @@
-from django.urls import path
-# from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import DocumentoViewSet
+
+router = DefaultRouter()
+router.register(r'documentos', DocumentoViewSet, basename='documento')
 
 urlpatterns = [
-    # Documentos (pendiente implementar vistas)
-    # path('upload/', views.DocumentoUploadView.as_view(), name='documento-upload'),
-    # path('', views.DocumentoListView.as_view(), name='documento-list'),
-    # path('<int:pk>/save/', views.DocumentoSaveView.as_view(), name='documento-save'),
-    # path('<int:pk>/versions/', views.DocumentoVersionsView.as_view(), name='documento-versions'),
-    # path('<int:pk>/content/', views.DocumentoContentView.as_view(), name='documento-content'),
-    # path('<int:pk>/', views.DocumentoDeleteView.as_view(), name='documento-delete'),
+    path('', include(router.urls)),
 ]

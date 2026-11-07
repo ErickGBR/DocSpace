@@ -26,21 +26,21 @@ class JWTAuthMiddleware:
 
         header = request.headers.get('Authorization', '')
         if not header.startswith('Bearer '):
-            return JsonResponse({'detail': 'Token requerido.'}, status=401)
+            return self.get_response(request)
 
         try:
             payload = decodificar(header[7:], 'access')
-        except TokenError as exc:
-            return JsonResponse({'detail': str(exc)}, status=401)
+        except TokenError:
+            return self.get_response(request)
 
         if not SesionJWT.objects.filter(jti=payload['jti'],
                                         revocada=False).exists():
-            return JsonResponse({'detail': 'Sesión revocada.'}, status=401)
+            return self.get_response(request)
 
         usuario = Usuario.objects.filter(id=payload['sub'],
                                          activo=True).first()
         if usuario is None:
-            return JsonResponse({'detail': 'Usuario no válido.'}, status=401)
+            return self.get_response(request)
 
         request.usuario = usuario
         request.jwt_payload = payload

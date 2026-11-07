@@ -8,6 +8,8 @@ class Documento(models.Model):
     usuario = models.ForeignKey(Usuario, on_delete=models.SET_NULL, null=True, related_name='documentos_creados')
     status = models.CharField(max_length=50, default='active')
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    size = models.BigIntegerField(default=0)
 
     def __str__(self):
         return self.nombre_documento

@@ -1,8 +1,10 @@
-from django.urls import path
-# from . import views
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+from .views import HistorialViewSet
+
+router = DefaultRouter()
+router.register(r'historial', HistorialViewSet, basename='historial')
 
 urlpatterns = [
-    # Historial (pendiente implementar vistas)
-    # path('historial/', views.HistorialListView.as_view(), name='historial-list'),
-    # path('historial/<int:pk>/', views.HistorialDetailView.as_view(), name='historial-detail'),
+    path('', include(router.urls)),
 ]

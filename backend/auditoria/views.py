@@ -1,32 +1,19 @@
-from rest_framework import generics
+from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 from .models import Historial
 from .serializers import HistorialSerializer
 
 
-class HistorialListView(generics.ListAPIView):
-    queryset = Historial.objects.all()
+class HistorialViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = HistorialSerializer
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        qs = super().get_queryset()
+        queryset = Historial.objects.filter(usuario=self.request.user)
         accion = self.request.query_params.get('accion')
-        if accion:
-            qs = qs.filter(accion=accion)
-        usuario = self.request.query_params.get('usuario')
-        if usuario:
-            qs = qs.filter(usuario_id=usuario)
         recurso_tipo = self.request.query_params.get('recurso_tipo')
+        if accion:
+            queryset = queryset.filter(accion=accion)
         if recurso_tipo:
-            qs = qs.filter(recurso_tipo=recurso_tipo)
-        limit = self.request.query_params.get('limit')
-        if limit:
-            try:
-                qs = qs[:int(limit)]
-            except ValueError:
-                pass
-        return qs
-
-
-class HistorialDetailView(generics.RetrieveAPIView):
-    queryset = Historial.objects.all()
-    serializer_class = HistorialSerializer
+            queryset = queryset.filter(recurso_tipo=recurso_tipo)
+        return queryset

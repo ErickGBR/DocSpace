@@ -35,10 +35,30 @@ class Usuario(models.Model):
         except (VerifyMismatchError, InvalidHashError, ValueError):
             return False
 
+    @classmethod
+    def create_user(cls, nombre_usuario, email, password, rol=None):
+        usuario = cls(
+            nombre_usuario=nombre_usuario,
+            email=email,
+        )
+        usuario.set_password(password)
+        if rol:
+            usuario.rol = rol
+        usuario.save()
+        return usuario
+
     def save(self, *args, **kwargs):
         if self.password and not self.password.startswith('$argon2'):
             self.set_password(self.password)
         super().save(*args, **kwargs)
+
+    @property
+    def is_authenticated(self):
+        return True
+
+    @property
+    def is_anonymous(self):
+        return False
 
     class Meta:
         db_table = 'usuarios'
