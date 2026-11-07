@@ -20,8 +20,11 @@ class RegisterSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-        validated_data['password'] = make_password(validated_data['password'])
-        return super().create(validated_data)
+        password = validated_data.pop('password')
+        usuario = Usuario.objects.create(**validated_data)
+        usuario.set_password(password)
+        usuario.save()
+        return usuario
 
 
 class LoginSerializer(serializers.Serializer):
